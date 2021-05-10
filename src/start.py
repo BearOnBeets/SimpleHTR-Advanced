@@ -1,3 +1,4 @@
+import numpy as np
 import os
 import cv2
 from WordSegmentation import wordSegmentation, prepareImg
@@ -9,6 +10,7 @@ from Model import Model, DecoderType
 from SamplePreprocessor import preprocess
 import argparse
 import tensorflow as tf
+import subprocess as sp
 
 class FilePaths:
     "filenames and paths to data"
@@ -27,47 +29,66 @@ def infer(model, fnImg):
     apex=open("D:/SimpleHTR/data/output.txt","a")
     apex.write(recognized[0]+" ")
     apex.close()
+    
+open('D:/SimpleHTR/data/output.txt', 'w').close()
+#import image
+image = cv2.imread('D:/SimpleHTR/input.png')
+#cv2.imshow('orig',image)
+#cv2.waitKey(0)
 
+#grayscale
+gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+#cv2.imshow('gray',gray)
+#cv2.waitKey(0)
 
-def main():
-    """reads images from data/ and outputs the word-segmentation to out/"""
+#binary
+ret,thresh = cv2.threshold(gray,127,255,cv2.THRESH_BINARY_INV)
+#cv2.imshow('second',thresh)
+#cv2.waitKey(0)
 
-    # read input images from 'in' directory
-    imgFiles = os.listdir('D:/SimpleHTR/input/')
-    for (i,f) in enumerate(imgFiles):
-        print('Segmenting words of sample %s'%f)
-        
-        # read image, prepare it by resizing it to fixed height and converting it to grayscale
-        img = prepareImg(cv2.imread('D:/SimpleHTR/input/%s'%f), 50)
-        
-        # execute segmentation with given parameters
-        # -kernelSize: size of filter kernel (odd integer)
-        # -sigma: standard deviation of Gaussian function used for filter kernel
-        # -theta: approximated width/height ratio of words, filter function is distorted by this factor
-        # - minArea: ignore word candidates smaller than specified area
-        res = wordSegmentation(img, kernelSize=25, sigma=11, theta=7, minArea=100)
-        
-        # write output to 'out/inputFileName' directory
-        '''if not os.path.exists('D:/SimpleHTR/out/%s'%f):
-            os.mkdir('D:/SimpleHTR/out/%s'%f)'''
-        
-        # iterate over all segmented words
-        print('Segmented into %d words'%len(res))
-        for (j, w) in enumerate(res):
-            (wordBox, wordImg) = w
-            (x, y, w, h) = wordBox
-            cv2.imwrite('D:/SimpleHTR/data/test.png', wordImg) # save word
-            cv2.rectangle(img,(x,y),(x+w,y+h),0,1) # draw bounding box in summary image
-            os.path.join(os.path.dirname('D:/SimpleHTR/src/main.py'))
-            tf.compat.v1.reset_default_graph()
-            exec(open('main.py').read())
-        
-        # output summary image with bounding boxes around words
-        cv2.imwrite('D:/SimpleHTR/data/summary.png', img)
+#dilation
+kernel = np.ones((5,100), np.uint8)
+img_dilation = cv2.dilate(thresh, kernel, iterations=1)
+#cv2.imshow('dilated',img_dilation)
+#cv2.waitKey(0)
 
-        apex = open("D:/SimpleHTR/data/output.txt","a")
-        apex.write("\n")
-        apex.close()
+#find contours
+ctrs,hier = cv2.findContours(img_dilation.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-if __name__ == '__main__':
-    main()
+#sort contours
+sorted_ctrs = sorted(ctrs, key=lambda ctr: cv2.boundingRect(ctr)[0])
+
+for i, ctr in enumerate(sorted_ctrs):
+    # Get bounding box
+    x, y, w, h = cv2.boundingRect(ctr)
+
+    # Getting ROI
+    roi = image[y:y+h, x:x+w]
+
+    # show ROI
+    #cv2.imshow('segment no:'+str(i),roi)
+    cv2.imwrite("D:/SimpleHTR/temp/segment_no_"+str(i)+".png",roi)
+    cv2.rectangle(image,(x,y),( x + w, y + h ),(90,0,255),2)
+    #cv2.waitKey(0)
+
+#cv2.imwrite('final_bounded_box_image.png',image)
+#cv2.imshow('marked areas',image)
+#cv2.waitKey(0)
+
+os.path.join(os.path.dirname('D:/SimpleHTR/src/wordmain.py'))
+tf.compat.v1.reset_default_graph()
+exec(open('wordmain.py').read())
+print("Deleting The Obsolete Images")
+for images in os.listdir('D:/SimpleHTR/temp'):
+    if images.endswith('.png') or images.endswith('.jpg') or images.endswith('.jpeg'):
+        os.remove(os.path.join('D:/SimpleHTR/temp',images)) 
+        
+for images in os.listdir('D:/SimpleHTR/data'):
+    if images.endswith('.png') or images.endswith('.jpg') or images.endswith('.jpeg'):
+        os.remove(os.path.join('D:/SimpleHTR/data',images))
+
+print("Opening The Output File in Notepad")
+programName = "notepad.exe"
+fileName = "D:/SimpleHTR/data/output.txt"
+sp.Popen([programName, fileName])
+

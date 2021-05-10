@@ -10,35 +10,17 @@ from SamplePreprocessor import preprocess
 import argparse
 import tensorflow as tf
 
-class FilePaths:
-    "filenames and paths to data"
-    fnCharList = 'D:/SimpleHTR/model/charList.txt'
-    fnSummary = 'D:/SimpleHTR/model/summary.json'
-    fnInfer = 'D:/SimpleHTR/data/test.png'
-    fnCorpus = 'D:/SimpleHTR/data/corpus.txt'
-
-def infer(model, fnImg):
-    "recognize text in image provided by file path"
-    img = preprocess(cv2.imread(fnImg, cv2.IMREAD_GRAYSCALE), Model.imgSize)
-    batch = Batch(None, [img])
-    (recognized, probability) = model.inferBatch(batch, True)
-    print(f'Recognized: "{recognized[0]}"')
-    print(f'Probability: {probability[0]}')
-    apex=open("D:/SimpleHTR/data/output.txt","a")
-    apex.write(recognized[0]+" ")
-    apex.close()
-
 
 def main():
     """reads images from data/ and outputs the word-segmentation to out/"""
 
     # read input images from 'in' directory
-    imgFiles = os.listdir('D:/SimpleHTR/input/')
+    imgFiles = os.listdir('D:/SimpleHTR/temp/')
     for (i,f) in enumerate(imgFiles):
         print('Segmenting words of sample %s'%f)
         
         # read image, prepare it by resizing it to fixed height and converting it to grayscale
-        img = prepareImg(cv2.imread('D:/SimpleHTR/input/%s'%f), 50)
+        img = prepareImg(cv2.imread('D:/SimpleHTR/temp/%s'%f), 50)
         
         # execute segmentation with given parameters
         # -kernelSize: size of filter kernel (odd integer)
@@ -63,11 +45,12 @@ def main():
             exec(open('main.py').read())
         
         # output summary image with bounding boxes around words
-        cv2.imwrite('D:/SimpleHTR/data/summary.png', img)
+        #cv2.imwrite('D:/SimpleHTR/data/summary.png', img)
 
         apex = open("D:/SimpleHTR/data/output.txt","a")
         apex.write("\n")
         apex.close()
+        
 
 if __name__ == '__main__':
     main()

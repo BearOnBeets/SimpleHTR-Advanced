@@ -1,23 +1,12 @@
 import argparse
 import json
-
 import cv2
 import editdistance
 from path import Path
-
 from DataLoaderIAM import DataLoaderIAM, Batch
 from Model import Model, DecoderType
 from SamplePreprocessor import preprocess
 from argparse import ArgumentParser
-
-
-class FilePaths:
-    "filenames and paths to data"
-    fnCharList = 'D:/SimpleHTR/model/charList.txt'
-    fnSummary = 'D:/SimpleHTR/model/summary.json'
-    fnInfer = 'D:/SimpleHTR/data/test.png'
-    fnCorpus = 'D:/SimpleHTR/data/corpus.txt'
-
 
 def write_summary(charErrorRates, wordAccuracies):
     with open(FilePaths.fnSummary, 'w') as f:
@@ -98,18 +87,6 @@ def validate(model, loader):
     wordAccuracy = numWordOK / numWordTotal
     print(f'Character error rate: {charErrorRate * 100.0}%. Word accuracy: {wordAccuracy * 100.0}%.')
     return charErrorRate, wordAccuracy
-
-
-def infer(model, fnImg):
-    "recognize text in image provided by file path"
-    img = preprocess(cv2.imread(fnImg, cv2.IMREAD_GRAYSCALE), Model.imgSize)
-    batch = Batch(None, [img])
-    (recognized, probability) = model.inferBatch(batch, True)
-    print(f'Recognized: "{recognized[0]}"')
-    apex = open("D:/SimpleHTR/data/output.txt","a")
-    apex.write(recognized[0]+" ")
-    apex.close()
-    print(f'Probability: {probability[0]}')
 
 
 def main():
