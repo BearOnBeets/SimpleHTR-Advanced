@@ -11,6 +11,7 @@ from SamplePreprocessor import preprocess
 import argparse
 import tensorflow as tf
 import subprocess as sp
+import sys
 
 class FilePaths:
     "filenames and paths to data"
@@ -29,7 +30,7 @@ def infer(model, fnImg):
     apex=open("D:/SimpleHTR/data/output.txt","a")
     apex.write(recognized[0]+" ")
     apex.close()
-    
+
 open('D:/SimpleHTR/data/output.txt', 'w').close()
 #import image
 image = cv2.imread('D:/SimpleHTR/input.png')
@@ -78,7 +79,6 @@ for i, ctr in enumerate(sorted_ctrs):
 os.path.join(os.path.dirname('D:/SimpleHTR/src/wordmain.py'))
 tf.compat.v1.reset_default_graph()
 exec(open('wordmain.py').read())
-print("Deleting The Obsolete Images")
 for images in os.listdir('D:/SimpleHTR/temp'):
     if images.endswith('.png') or images.endswith('.jpg') or images.endswith('.jpeg'):
         os.remove(os.path.join('D:/SimpleHTR/temp',images)) 
@@ -87,8 +87,10 @@ for images in os.listdir('D:/SimpleHTR/data'):
     if images.endswith('.png') or images.endswith('.jpg') or images.endswith('.jpeg'):
         os.remove(os.path.join('D:/SimpleHTR/data',images))
 
-print("Opening The Output File in Notepad")
-programName = "notepad.exe"
-fileName = "D:/SimpleHTR/data/output.txt"
-sp.Popen([programName, fileName])
+for images in os.listdir('D:/SimpleHTR'):
+    if images.endswith('.png') or images.endswith('.jpg') or images.endswith('.jpeg'):
+        os.remove(os.path.join('D:/SimpleHTR',images))
+
+
+
 

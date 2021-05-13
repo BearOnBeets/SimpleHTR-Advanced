@@ -7,7 +7,9 @@ from DataLoaderIAM import DataLoaderIAM, Batch
 from Model import Model, DecoderType
 from SamplePreprocessor import preprocess
 from argparse import ArgumentParser
+import os
 
+    
 def write_summary(charErrorRates, wordAccuracies):
     with open(FilePaths.fnSummary, 'w') as f:
         json.dump({'charErrorRates': charErrorRates, 'wordAccuracies': wordAccuracies}, f)
@@ -94,7 +96,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--train', help='train the NN', action='store_true')
     parser.add_argument('--validate', help='validate the NN', action='store_true')
-    parser.add_argument('--decoder', choices=['bestpath', 'beamsearch', 'wordbeamsearch'], default='bestpath',
+    parser.add_argument('--decoder', choices=['bestpath', 'beamsearch', 'wordbeamsearch'], default='wordbeamsearch',
                         help='CTC decoder')
     parser.add_argument('--batch_size', help='batch size', type=int, default=100)
     parser.add_argument('--data_dir', help='directory containing IAM dataset', type=Path, required=False)

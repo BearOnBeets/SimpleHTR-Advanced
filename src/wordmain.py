@@ -9,11 +9,11 @@ from Model import Model, DecoderType
 from SamplePreprocessor import preprocess
 import argparse
 import tensorflow as tf
+import sys
 
 
 def main():
-    """reads images from data/ and outputs the word-segmentation to out/"""
-
+  
     # read input images from 'in' directory
     imgFiles = os.listdir('D:/SimpleHTR/temp/')
     for (i,f) in enumerate(imgFiles):
