@@ -13,24 +13,10 @@ import tensorflow as tf
 import subprocess as sp
 import sys
 
-class FilePaths:
-    "filenames and paths to data"
-    fnCharList = 'D:/SimpleHTR/model/charList.txt'
-    fnSummary = 'D:/SimpleHTR/model/summary.json'
-    fnInfer = 'D:/SimpleHTR/data/test.png'
-    fnCorpus = 'D:/SimpleHTR/data/corpus.txt'
-
-def infer(model, fnImg):
-    "recognize text in image provided by file path"
-    img = preprocess(cv2.imread(fnImg, cv2.IMREAD_GRAYSCALE), Model.imgSize)
-    batch = Batch(None, [img])
-    (recognized, probability) = model.inferBatch(batch, True)
-    print(f'Recognized: "{recognized[0]}"')
-    print(f'Probability: {probability[0]}')
-    apex=open("D:/SimpleHTR/data/output.txt","a")
-    apex.write(recognized[0]+" ")
-    apex.close()
-
+for images in os.listdir('D:/SimpleHTR/data'):
+    if images.endswith('.png') or images.endswith('.jpg') or images.endswith('.jpeg'):
+        os.remove(os.path.join('D:/SimpleHTR/data',images)) 
+        
 open('D:/SimpleHTR/data/output.txt', 'w').close()
 #import image
 image = cv2.imread('D:/SimpleHTR/input.png')

@@ -9,7 +9,7 @@ from SamplePreprocessor import preprocess
 from argparse import ArgumentParser
 import os
 
-    
+   
 def write_summary(charErrorRates, wordAccuracies):
     with open(FilePaths.fnSummary, 'w') as f:
         json.dump({'charErrorRates': charErrorRates, 'wordAccuracies': wordAccuracies}, f)
